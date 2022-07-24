@@ -1,0 +1,16 @@
+.item {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(71, 146, 81, 0.91);
+  }
+  .name {
+    font-weight: 700;
+    margin-right: 40px;
+  }
+  .tel {
+    font-weight: 700;
+    font-size: 24px;
+    margin-right: auto;
+  }

@@ -1,57 +1,78 @@
 import { Component } from 'react';
-import { Section } from './Section/Section';
-import { FeedbackOptions } from './FeedbackOptions/FeedbackOptions';
-import { Statistics } from './Statistics/Statistics';
-import { Notification } from './Notification/Notification';
-//--------------------------------------------------------------------//
+import { ContactList } from './ContactList/ContactList';
+import { Filter } from './Filter/Filter';
+import { Form } from './Form/Form';
+import { Container } from './Container/Container';
 
 export class App extends Component {
   state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
-  totalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    const total = good + neutral + bad;
-    return total;
-  };
-
-  positiveFeedbackPercentage = () => {
-    return Math.round((this.state.good * 100) / this.totalFeedback());
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ],
+    filter: '',
+    name: '',
+    number: '',
   };
 
-  handlerBtn = e => {
-    const { name } = e.target;
-    this.setState(ps => {
-      return { [name]: ps[name] + 1 };
+  handlerSubmit = data => {
+    const inContacts = this.state.contacts.some(
+      contact =>
+        data.name.toLocaleLowerCase() === contact.name.toLocaleLowerCase()
+    );
+    if (inContacts) {
+      alert(`${data.name} is already in contacts`);
+      return;
+    }
+
+    this.setState(prev => {
+      return { contacts: [...prev.contacts, data] };
+    });
+  };
+
+  handlerFilter = ({ target: { value } }) => {
+    this.setState({ filter: value });
+  };
+
+  getVisableContacts = () => {
+    const { contacts, filter } = this.state;
+
+    return contacts.filter(({ name }) => {
+      return name.toLocaleLowerCase().includes(filter.toLocaleLowerCase());
+    });
+  };
+  handlerDelete = id => {
+    this.setState({
+      contacts: this.state.contacts.filter(contact => id !== contact.id),
     });
   };
 
   render() {
-    const { good, neutral, bad } = this.state;
+    const { filter } = this.state;
     return (
-      <>
-        <Section title="Please leave feedback">
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.handlerBtn}
-          ></FeedbackOptions>
-        </Section>
-        <Section title="Statistics">
-          {!this.totalFeedback() ? (
-            <Notification message="There is no feedback"></Notification>
-          ) : (
-            <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={this.totalFeedback()}
-              positivePercentage={this.positiveFeedbackPercentage()}
-            />
-          )}
-        </Section>
-      </>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: 40,
+          color: '#010101',
+        }}
+      >
+        <Container title="Phonebook">
+          <Form onSubmit={this.handlerSubmit} />
+        </Container>
+        <Container title="Contacts">
+          <Filter filter={filter} handlerFilter={this.handlerFilter} />
+          <ContactList
+            contacts={this.getVisableContacts()}
+            onDelete={this.handlerDelete}
+          />
+        </Container>
+      </div>
     );
   }
 }
